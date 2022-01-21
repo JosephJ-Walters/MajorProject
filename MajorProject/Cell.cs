@@ -20,7 +20,6 @@ namespace MajorProject
         {
             Coord[0] = x;
             Coord[1] = y;
-
         }
     }
 }

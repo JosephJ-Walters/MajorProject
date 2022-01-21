@@ -13,6 +13,8 @@ namespace MajorProject
         private int _cellSize;
         private Cell[,] _cellList; //Array of all cells
         //private Cell[] _cellArr;
+        private int _cellsVisited;
+        private int _cellCount;
         
 
         public int Width { get => _width; set => _width = value; }
@@ -21,6 +23,8 @@ namespace MajorProject
         //public Cell[] CellArr { get => _cellArr; set => _cellArr = value; }
 
         public Cell[,] CellList { get => _cellList; set => _cellList = value; }
+        public int CellsVisited { get => _cellsVisited; set => _cellsVisited = value; }
+        public int CellCount { get => _cellCount; set => _cellCount = value; }
 
         enum direction
         {
@@ -34,6 +38,8 @@ namespace MajorProject
             Height = h;
             Width = w;
             Cellsize = 4;
+            CellsVisited = 0;
+            CellCount = 0;
             //CellArr = new Cell[h * w];
             CellList = new Cell[w, h];
             /*for (int y = 0; y < h*w; y++)
@@ -49,6 +55,17 @@ namespace MajorProject
                 for (int x = 0; x < w; x++)
                 {
                     CellList[x, y] = new Cell(x, y);
+                }
+            }
+        }
+
+        public void Pathfind(int[] start)
+        {
+            while (CellsVisited < CellCount)
+            {
+                if (start[0] == 0 && start[1] == 0)
+                {
+
                 }
             }
         }
