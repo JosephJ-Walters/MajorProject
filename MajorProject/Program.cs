@@ -16,10 +16,12 @@ namespace MajorProject // Note: actual namespace depends on the project name.
             Stack stack1 = new Stack(des_height, des_width);
 
             //Testing stack works
-            stack1.Push(maze1.CellArr[3]);
+            //stack1.Push(maze1.CellArr[3]);
+            stack1.Push(maze1.CellList[3,7]);
+
             //Console.WriteLine(maze1.CellArr[8].Coord[0]);
             Console.WriteLine(stack1.Read()[0] + " , " + stack1.Read()[1]);
-            stack1.Push(maze1.CellArr[67]);
+            stack1.Push(maze1.CellList[6,7]);
             Console.WriteLine(stack1.Read()[0] + " , " + stack1.Read()[1]);
             stack1.Pop();
             Console.WriteLine(stack1.Read()[0] + " , " + stack1.Read()[1]);
