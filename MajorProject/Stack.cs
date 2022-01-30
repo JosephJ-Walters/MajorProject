@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,16 +16,18 @@ namespace MajorProject
 
         public Stack(int h, int w)
         {
-            StackList = new int[2][];
+            StackList = new int[h*w][];
         }
 
         public void Push(Cell cell)
         {
-            StackList[++Head] = cell.Coord;
+            Head++;
+            StackList[Head] = cell.Coord;
         }
         public void Pop()
         {
             Head--;
+            Console.WriteLine("POPPED!");
         }
 
         public int[] Read()
