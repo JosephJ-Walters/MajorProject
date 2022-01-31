@@ -4,6 +4,48 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+public struct neighboursVisited
+{
+    public neighboursVisited (int Top, int Bottom, int Left, int Right)
+    {
+        top = Top;
+        bottom = Bottom;
+        left = Left;
+        right = Right;
+    }
+
+    public int count()
+    {
+        int total = 0;
+
+        if (top != -1)
+            total+= top;
+
+        if (bottom != -1)
+            total += bottom;
+
+        if (right != -1)
+            total += right;
+
+        if (left != -1)
+            total += left;
+
+        return total;
+    }
+
+    public int top = 0;
+    public int bottom = 0; 
+    public int left = 0;   
+    public int right = 0;
+
+
+
+
+
+};
+
+
+
 namespace MajorProject
 {
     internal class Cell
@@ -27,6 +69,52 @@ namespace MajorProject
             {
                 Available[i] = false; //Available { N, E, S, W)
             }
+        }
+
+        public neighboursVisited returnNeighbours(Cell[,] celllist)
+        {
+            int topVisited;
+            int bottomVisited;
+            int leftVisited;
+            int rightVisited;
+            try
+            {
+                topVisited = (celllist[Coord[0], Coord[1] - 1].Visited == false) ? 1 : 0;
+            }
+            catch
+            {
+                topVisited = -1;
+            }
+
+            try
+            {
+                bottomVisited = (celllist[Coord[0], Coord[1] + 1].Visited == false) ? 1 : 0;
+            }
+            catch
+            {
+                bottomVisited = -1;
+            }
+
+            try
+            {
+                leftVisited = (celllist[Coord[0] - 1, Coord[1]].Visited == false) ? 1 : 0;
+            }
+            catch
+            {
+                leftVisited = -1;
+            }
+
+            try
+            {
+                rightVisited = (celllist[Coord[0] + 1, Coord[1]].Visited == false) ? 1 : 0;
+            }
+            catch
+            {
+                rightVisited = -1;
+            }
+            return new neighboursVisited(topVisited, bottomVisited, leftVisited, rightVisited);
+
+
         }
 
         public void neighbours(Cell[,] celllist)

@@ -18,6 +18,8 @@ namespace MajorProject
         private int[] _currentLocation = new int[2];
         private Random rnd = new Random();
         private int _choice;
+        private int[][] _displayCells;
+        int _displayCellsCount;
 
 
         public int Width { get => _width; set => _width = value; }
@@ -31,6 +33,8 @@ namespace MajorProject
         public int[] CurrentLocation { get => _currentLocation; set => _currentLocation = value; }
         public int Choice { get => _choice; set => _choice = value; }
         public Random Rnd { get => rnd; set => rnd = value; }
+        public int[][] DisplayCells { get => _displayCells; set => _displayCells = value; }
+        public int DisplayCellsCount { get => _displayCellsCount; set => _displayCellsCount = value; }
 
         public enum Direction : int
         {
@@ -49,6 +53,9 @@ namespace MajorProject
             CellCount = h * w;
             //CellArr = new Cell[h * w];
             CellList = new Cell[w, h];
+            DisplayCells = new int[h * w][];
+            DisplayCellsCount = 0;
+
             /*for (int y = 0; y < h*w; y++)
             {
                 CellArr[y] = new Cell(y%w, y/h);
@@ -79,27 +86,25 @@ namespace MajorProject
         public void Nextcell(Stack stack1, ref Stack stackDisplay)
         {
             CellList[CurrentLocation[0], CurrentLocation[1]].neighbours(CellList); //Finds unvisited cells around itself
-            Console.WriteLine(CurrentLocation[0] + " , " + CurrentLocation[1]);
+            //Console.WriteLine(CurrentLocation[0] + " , " + CurrentLocation[1]);
             CellsVisited++;
             int num = 0;
-            foreach (bool item in CellList[CurrentLocation[0], CurrentLocation[1]].Available) //Finds number of unvisited cells around current cell
-            {
-                if (item == true)
-                {
-                    num++;
-                }
-            }
 
-            Choice = Rnd.Next(num); //The (N-1) available cell will be the next visible,
+
+            neighboursVisited currentNeighbours = CellList[CurrentLocation[0], CurrentLocation[1]].returnNeighbours(CellList);
+
+
+            Choice = Rnd.Next(0, currentNeighbours.count()); //The (N-1) available cell will be the next visited,
             int index = 0; //The current index of the array
             int numpos = 0; //The (N-1) 'true' index visited
 
-            if (num == 0) //If no cells are available then pop the stack and read the new top value until cell is available
+            if (currentNeighbours.count() == 0) //If no cells are available then pop the stack and read the new top value until cell is available
             {
                 stack1.Pop(); //Removes top cell location from stack
                 CurrentLocation = stack1.Read();
                 Nextcell(stack1, ref stackDisplay);
             }
+
             else
             {
                 while (CellList[CurrentLocation[0], CurrentLocation[1]].Visited == false) //Run until current cell is set to visited, visited = true when next cell found
@@ -117,7 +122,7 @@ namespace MajorProject
                                     //CurrentLocation = { CurrentLocation[0], CurrentLocation[1] - 1 }; //Updates location
                                     CurrentLocation[1] = CurrentLocation[1] - 1;
                                     stack1.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Pushes new location to stack
-                                    stackDisplay.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Stores next cell visitied in order
+                                    //stackDisplay.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Stores next cell visitied in order
                                     Nextcell(stack1, ref stackDisplay);
                                     break;
 
@@ -127,7 +132,7 @@ namespace MajorProject
                                     //CurrentLocation = { CurrentLocation[0] + 1, CurrentLocation[1] }; //Updates location
                                     CurrentLocation[0] = CurrentLocation[0] + 1;
                                     stack1.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Pushes new location to stack
-                                    stackDisplay.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Stores next cell visitied in order
+                                    //stackDisplay.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Stores next cell visitied in order
                                     Nextcell(stack1, ref stackDisplay);
                                     break;
 
@@ -137,7 +142,7 @@ namespace MajorProject
                                     //CurrentLocation = { CurrentLocation[0], CurrentLocation[1] + 1 }; //Updates location
                                     CurrentLocation[1] = CurrentLocation[1] + 1;
                                     stack1.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Pushes new location to stack
-                                    stackDisplay.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Stores next cell visitied in order
+                                    //stackDisplay.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Stores next cell visitied in order
                                     Nextcell(stack1, ref stackDisplay);
                                     break;
 
@@ -147,7 +152,7 @@ namespace MajorProject
                                     //CurrentLocation = { CurrentLocation[0] - 1, CurrentLocation[1] }; //Updates location
                                     CurrentLocation[0] = CurrentLocation[0] - 1;
                                     stack1.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Pushes new location to stack
-                                    stackDisplay.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Stores next cell visitied in order
+                                    //stackDisplay.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Stores next cell visitied in order
                                     Nextcell(stack1, ref stackDisplay);
                                     break;
 
@@ -168,6 +173,66 @@ namespace MajorProject
                 }
             }
             //CellList[CurrentLocation[0], CurrentLocation[1]].Available[choice]
+        }
+        public void Render(int h, int w)
+        {
+            Console.Clear();
+            for (int Vcells = 0; Vcells < h; Vcells++) //Increments the row visited
+            {
+                int CDepth = 0;
+
+                for (int n = 0; n < 3; n++) //Prints every cell in this row three times
+                {
+                    for (int Hcells = 0; Hcells < w; Hcells++) //Goes through every cell in a row
+                    {
+                        if (CellList[Hcells, Vcells].Walls[0] == true)
+                        {
+                            for (int cellRow = 0; cellRow < Cellsize-1; cellRow++) //If this cell has an east wall
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkBlue;
+                                Console.Write(" ");
+                            }
+                            Console.BackgroundColor = ConsoleColor.White;
+                            Console.Write(" ");
+                        } 
+                        else
+                        {
+                            for (int cellRow = 0; cellRow < Cellsize; cellRow++) // If this cell does not have an east wall
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkBlue;
+                                Console.Write(" ");
+                            }
+                        }
+                        //Console.WriteLine();
+                    }
+                    Console.WriteLine();
+                }
+                for (int Hcells = 0; Hcells < w; Hcells++)
+                {
+                    if (CellList[Hcells, Vcells].Walls[1] == false)
+                    {
+                        for (int cellRow = 0; cellRow < Cellsize - 1; cellRow++)
+                        {
+                            Console.BackgroundColor = ConsoleColor.DarkBlue;
+                            Console.Write(" ");
+                        }
+                        Console.BackgroundColor = ConsoleColor.White;
+                        Console.Write(" ");
+
+                    }
+                    else
+                    {
+                        for (int cellRow = 0; cellRow < Cellsize; cellRow++)
+                        {
+                            Console.BackgroundColor = ConsoleColor.White;
+                            Console.Write(" ");
+                        }
+                    }
+                }
+                Console.WriteLine();
+
+                CDepth++;
+            }
         }
     }
 }
