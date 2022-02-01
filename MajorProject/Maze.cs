@@ -87,13 +87,17 @@ namespace MajorProject
         {
             CellList[CurrentLocation[0], CurrentLocation[1]].neighbours(CellList); //Finds unvisited cells around itself
             //Console.WriteLine(CurrentLocation[0] + " , " + CurrentLocation[1]);
-            CellsVisited++;
-            int num = 0;
+            if (CellList[CurrentLocation[0], CurrentLocation[1]].Visited == false)
+            {
+                CellsVisited++;
+
+            }
+            CellList[CurrentLocation[0], CurrentLocation[1]].Visited = false;
 
 
             neighboursVisited currentNeighbours = CellList[CurrentLocation[0], CurrentLocation[1]].returnNeighbours(CellList);
 
-
+            int number = currentNeighbours.count() ;
             Choice = Rnd.Next(0, currentNeighbours.count()); //The (N-1) available cell will be the next visited,
             int index = 0; //The current index of the array
             int numpos = 0; //The (N-1) 'true' index visited
@@ -101,15 +105,26 @@ namespace MajorProject
             if (currentNeighbours.count() == 0) //If no cells are available then pop the stack and read the new top value until cell is available
             {
                 stack1.Pop(); //Removes top cell location from stack
-                CurrentLocation = stack1.Read();
+                CellList[CurrentLocation[0], CurrentLocation[1]].Visited = true;
+                CurrentLocation[0] = stack1.Read()[0]; CurrentLocation[1] = stack1.Read()[1];
+
                 Nextcell(stack1, ref stackDisplay);
+                //return;
             }
-
-            else
-            {
+            //THIS NEEDS TO BE MOVED INTO THE WHILE
+            //else
+            //{
                 while (CellList[CurrentLocation[0], CurrentLocation[1]].Visited == false) //Run until current cell is set to visited, visited = true when next cell found
-                {
-
+                { //This while need to be whilst there are walls 
+                    //FIX THIS RECURSIVE WONT WORK BECAUSE IT WONT RUN IF ITS ALREADY BEEN OVER
+                    /*if (currentNeighbours.count() == 0) //If no cells are available then pop the stack and read the new top value until cell is available
+                    {
+                        stack1.Pop(); //Removes top cell location from stack
+                        CellList[CurrentLocation[0], CurrentLocation[1]].Visited = true;
+                        CurrentLocation = stack1.Read();
+                        Nextcell(stack1, ref stackDisplay);
+                        return;
+                    }*/
                     if (CellList[CurrentLocation[0], CurrentLocation[1]].Available[index] == true) 
                     {
                         if (numpos == Choice)
@@ -118,17 +133,15 @@ namespace MajorProject
                             {
                                 case (int)Direction.N: //North
                                     CellList[CurrentLocation[0], CurrentLocation[1] - 1].Walls[1] = false; //Breaks south wall of cell above
-                                    CellList[CurrentLocation[0], CurrentLocation[1]].Visited = true;
-                                    //CurrentLocation = { CurrentLocation[0], CurrentLocation[1] - 1 }; //Updates location
+                                    //CellList[CurrentLocation[0], CurrentLocation[1]].Visited = true;
                                     CurrentLocation[1] = CurrentLocation[1] - 1;
                                     stack1.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Pushes new location to stack
-                                    //stackDisplay.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Stores next cell visitied in order
-                                    Nextcell(stack1, ref stackDisplay);
+                                    Nextcell(stack1, ref stackDisplay); //PASS IN NEW COORDS
                                     break;
 
                                 case (int)Direction.E: //East
                                     CellList[CurrentLocation[0], CurrentLocation[1]].Walls[0] = false; //Breaks east wall of current cell
-                                    CellList[CurrentLocation[0], CurrentLocation[1]].Visited = true;
+                                    //CellList[CurrentLocation[0], CurrentLocation[1]].Visited = true;
                                     //CurrentLocation = { CurrentLocation[0] + 1, CurrentLocation[1] }; //Updates location
                                     CurrentLocation[0] = CurrentLocation[0] + 1;
                                     stack1.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Pushes new location to stack
@@ -138,7 +151,7 @@ namespace MajorProject
 
                                 case (int)Direction.S: //South
                                     CellList[CurrentLocation[0], CurrentLocation[1]].Walls[1] = false; //Breaks south wall of current cell
-                                    CellList[CurrentLocation[0], CurrentLocation[1]].Visited = true;
+                                    //CellList[CurrentLocation[0], CurrentLocation[1]].Visited = true;
                                     //CurrentLocation = { CurrentLocation[0], CurrentLocation[1] + 1 }; //Updates location
                                     CurrentLocation[1] = CurrentLocation[1] + 1;
                                     stack1.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Pushes new location to stack
@@ -148,7 +161,7 @@ namespace MajorProject
 
                                 case (int)Direction.W: //West
                                     CellList[CurrentLocation[0] - 1, CurrentLocation[1]].Walls[0] = false; //Breaks west wall of cell to the right
-                                    CellList[CurrentLocation[0], CurrentLocation[1]].Visited = true;
+                                    //CellList[CurrentLocation[0], CurrentLocation[1]].Visited = true;
                                     //CurrentLocation = { CurrentLocation[0] - 1, CurrentLocation[1] }; //Updates location
                                     CurrentLocation[0] = CurrentLocation[0] - 1;
                                     stack1.Push(CellList[CurrentLocation[0], CurrentLocation[1]]); //Pushes new location to stack
@@ -162,16 +175,16 @@ namespace MajorProject
                         }
                         else
                         {
-                            numpos++;
-                            index++;
+                            numpos = (numpos+ 1) % 4;
+                            index = (index + 1) % 4;
                         }
                     }
                     else
                     {
-                        index++;
+                        index = (index + 1) % 4;
                     }
                 }
-            }
+            //}
             //CellList[CurrentLocation[0], CurrentLocation[1]].Available[choice]
         }
         public void Render(int h, int w)
