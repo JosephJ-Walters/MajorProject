@@ -29,18 +29,12 @@ namespace MajorProject // Note: actual namespace depends on the project name.
             */
 
             int[] start = { 0, 0 };
-            stack1.Push(maze1.CellList[maze1.CurrentLocation[0], maze1.CurrentLocation[1]]);
+
+            //stack1.Push(maze1.CellList[maze1.CurrentLocation[0], maze1.CurrentLocation[1]]);
             stackDisplay.Push(maze1.CellList[maze1.CurrentLocation[0], maze1.CurrentLocation[1]]);
             maze1.Pathfind(start, stack1, ref stackDisplay);
-            Console.WriteLine("Are you ready to see the list of visited cells?");
+            maze1.Render(des_height, des_width);
             Console.ReadKey();
-            int test1 = 0;
-            while (test1 < des_height*des_width)
-            {
-                Console.WriteLine(stackDisplay.Read()[0] + " , " + stackDisplay.Read()[1]);
-                stackDisplay.Pop();
-                test1++;
-            } 
         }
     }
 
