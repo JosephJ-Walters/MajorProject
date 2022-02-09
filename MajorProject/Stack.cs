@@ -30,7 +30,7 @@ namespace MajorProject
             Console.WriteLine("POPPED!");
         }
 
-        public int[] Read()
+        public int[] Peek()
         {
             return StackList[Head];
         }
