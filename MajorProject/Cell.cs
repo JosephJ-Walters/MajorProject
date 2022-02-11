@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace MajorProject
 {
     internal class Cell
@@ -12,12 +13,16 @@ namespace MajorProject
         private int[] coord = new int[2];
         private bool[] _walls = { true, true }; //East Wall, South Wall
         private bool[] _available = new bool[4];
+        private List<char> _around = new List<char>();
+        private bool _fullyEx = false;
 
 
         public bool Visited { get => _visited; set => _visited = value; }
         public int[] Coord { get => coord; set => coord = value; }
         public bool[] Walls { get => _walls; set => _walls = value; }
-        public bool[] Available { get => _available; set => _available = value; }
+        public bool[] Available { get => _available; set => _available = value; } //Store the direction of available cells in list, then compare this in a switch
+        public List<char> Around { get => _around; set => _around = value; }
+        public bool FullyEx { get => _fullyEx; set => _fullyEx = value; }
 
         public Cell(int x, int y)
         {
@@ -29,55 +34,64 @@ namespace MajorProject
             }
         }
 
-        public void neighbours(Cell[,] celllist)
+        public List<char> neighbours(Cell[,] celllist)
         {
+            Around.Clear();
             try //North cell check
             {
                 if (celllist[Coord[0], Coord[1] - 1].Visited == false) //Checks if North cell is available
                 {
-                    Available[0] = true;
+                    Around.Add('N');
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("No cell north");
+                //Console.WriteLine("No cell north");
             }
 
             try //South cell check
             {
                 if (celllist[Coord[0], Coord[1] + 1].Visited == false) //Checks if South Cell is available
                 {
-                    Available[2] = true;
+                    Around.Add('S');
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("No cell south");
+                //Console.WriteLine("No cell south");
             }
 
             try //West cell check
             {
                 if (celllist[Coord[0] - 1, Coord[1]].Visited == false) //Checks if West cell is available
                 {
-                    Available[3] = true;
+                    Around.Add('W');
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("No cell west");
+                //Console.WriteLine("No cell west");
             }
 
-            try //east cell check
+            try //East cell check
             {
                 if (celllist[Coord[0] + 1, Coord[1]].Visited == false) //checks if East cell is available
                 {
-                    Available[1] = true;
+                    Around.Add('E');
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("No cell east");
+                //Console.WriteLine("No cell east");
             }
+
+            if (Around.Count() == 0)
+            {
+                Around.Add('Q');
+                FullyEx = true;
+            }
+
+            return Around;
         }
     }
 }
