@@ -1,28 +1,190 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace MajorProject // Note: actual namespace depends on the project name.
+namespace MajorProject
 {
-    internal class Program
+    internal class Maze
     {
-        static void Main(string[] args)
+        private int _width;
+        private int _height;
+        private int _cellSize;
+        private Cell[,] _cellList; //Array of all cells
+        private int _cellsVisited;
+        private int _cellCount;
+        private int[] _currentLocation = new int[2];
+        private Random rnd = new Random();
+        private int _choice;
+        private int[][] _displayCells;
+        int _displayCellsCount;
+        List<char> _around = new List<char>();
+
+
+
+        public int Width { get => _width; set => _width = value; }
+        public int Height { get => _height; set => _height = value; }
+        public int Cellsize { get => _cellSize; set => _cellSize = value; }
+
+        public Cell[,] CellList { get => _cellList; set => _cellList = value; }
+        public int CellsVisited { get => _cellsVisited; set => _cellsVisited = value; }
+        public int CellCount { get => _cellCount; set => _cellCount = value; }
+        public int[] CurrentLocation { get => _currentLocation; set => _currentLocation = value; }
+        public int Choice { get => _choice; set => _choice = value; }
+        public Random Rnd { get => rnd; set => rnd = value; }
+        public int[][] DisplayCells { get => _displayCells; set => _displayCells = value; }
+        public int DisplayCellsCount { get => _displayCellsCount; set => _displayCellsCount = value; }
+        public List<char> Around { get => _around; set => _around = value; }
+
+        public enum Direction : int
         {
-            Console.WriteLine("Welcome to the maze");
-            Console.Write("Please enter the height of the maze desired: ");
-            int des_height = int.Parse(Console.ReadLine());
-            Console.Write("Please enter the width of the maze desired: ");
-            int des_width = int.Parse(Console.ReadLine());
+            N,
+            E,
+            S,
+            W
+        }
 
-            Maze maze1 = new Maze(des_height, des_width);
-            //Stack stackDisplay = new Stack(des_height, des_width);
+        public Maze(int h, int w)
+        {
+            Height = h;
+            Width = w;
+            Cellsize = 4;
+            CellsVisited = 0;
+            CellCount = h * w;
+            CellList = new Cell[w, h];
+            DisplayCells = new int[h * w][];
+            DisplayCellsCount = 0;
 
-            int[] start = { 5, 5 };
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    CellList[x, y] = new Cell(x, y);
+                }
+            }
+        }
 
-            //stack1.Push(maze1.CellList[maze1.CurrentLocation[0], maze1.CurrentLocation[1]]);
-            //stackDisplay.Push(maze1.CellList[maze1.CurrentLocation[0], maze1.CurrentLocation[1]]);
-            maze1.Pathfind(start);
-            maze1.Render(des_height, des_width);
-            Console.ReadKey();
+        public void Pathfind(int[] start)
+        {
+            while (CellsVisited < CellCount)
+            {
+                CurrentLocation[0] = start[0]; CurrentLocation[1] = start[1];
+                Nextcell(CurrentLocation[0], CurrentLocation[1]);
+            }
+        }
+
+        public void Nextcell(int x, int y)
+        {
+            CellList[x, y].Visited = true;
+            CellsVisited++;
+
+            while (CellList[x, y].FullyEx == false)
+            {
+
+
+                Around.Clear();
+                Around = CellList[x, y].neighbours(CellList); //Finds unvisited cells around itself
+                Choice = rnd.Next(CellList[x, y].Around.Count());
+
+                switch (CellList[x, y].Around[Choice])
+                {
+                    case 'N':
+                        Console.WriteLine("N");
+                        CellList[x, y - 1].Walls[1] = false; //Breaks south wall of cell above
+                        Nextcell(x, y - 1);
+                        break;
+
+                    case 'E':
+                        Console.WriteLine("E");
+                        CellList[x, y].Walls[0] = false; //Breaks east wall of current cell
+                        Nextcell(x + 1, y);
+                        break;
+
+                    case 'S':
+                        Console.WriteLine("S");
+                        CellList[x, y].Walls[1] = false; //Breaks south wall of current cell
+                        Nextcell(x, y + 1);
+                        break;
+
+                    case 'W':
+                        Console.WriteLine("W");
+                        CellList[x - 1, y].Walls[0] = false; //Breaks west wall of cell to the right
+                        Nextcell(x - 1, y);
+                        break;
+
+                    case 'Q':
+                        Console.WriteLine("Q");
+                        return;
+                        break;
+
+                    default:
+                        break;
+                }
+                Around.Clear();
+                Around = CellList[x, y].neighbours(CellList); //Finds unvisited cells around itself
+            }
+
+        }
+        public void Render(int h, int w)
+        {
+            Console.Clear();
+            for (int Vcells = 0; Vcells < h; Vcells++) //Increments the row visited
+            {
+                int CDepth = 0;
+
+                for (int n = 0; n < 3; n++) //Prints every cell in this row three times
+                {
+                    for (int Hcells = 0; Hcells < w; Hcells++) //Goes through every cell in a row
+                    {
+                        if (CellList[Hcells, Vcells].Walls[0] == true)
+                        {
+                            for (int cellRow = 0; cellRow < Cellsize - 1; cellRow++) //If this cell has an east wall
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkBlue;
+                                Console.Write(" ");
+                            }
+                            Console.BackgroundColor = ConsoleColor.White;
+                            Console.Write(" ");
+                        }
+                        else
+                        {
+                            for (int cellRow = 0; cellRow < Cellsize; cellRow++) // If this cell does not have an east wall
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkBlue;
+                                Console.Write(" ");
+                            }
+                        }
+                        //Console.WriteLine();
+                    }
+                    Console.WriteLine();
+                }
+                for (int Hcells = 0; Hcells < w; Hcells++)
+                {
+                    if (CellList[Hcells, Vcells].Walls[1] == false)
+                    {
+                        for (int cellRow = 0; cellRow < Cellsize - 1; cellRow++)
+                        {
+                            Console.BackgroundColor = ConsoleColor.DarkBlue;
+                            Console.Write(" ");
+                        }
+                        Console.BackgroundColor = ConsoleColor.White;
+                        Console.Write(" ");
+
+                    }
+                    else
+                    {
+                        for (int cellRow = 0; cellRow < Cellsize; cellRow++)
+                        {
+                            Console.BackgroundColor = ConsoleColor.White;
+                            Console.Write(" ");
+                        }
+                    }
+                }
+                Console.WriteLine();
+
+                CDepth++;
+            }
         }
     }
-
 }
